@@ -1,0 +1,57 @@
+# Specify the Kubernetes API version for Deployment resources
+apiVersion: apps/v1
+
+# Define the type of Kubernetes resource (Deployment manages ReplicaSets and Pods)
+kind: Deployment
+
+# Metadata section: information about this Deployment
+metadata:
+  name: kubernetes-demo-api         # Name of the deployment
+  labels:
+    app: kubernetes-demo-api        # Label to identify this deployment
+
+# Specification section: defines the desired state of the Deployment
+spec:
+  # Number of pod replicas to run (2 pods for high availability)
+  replicas: 2
+  
+  # Selector: tells Kubernetes which pods belong to this deployment
+  selector:
+    matchLabels:
+      app: kubernetes-demo-api      # Match pods with this label
+  
+  # Template: defines the pods that will be created
+  template:
+    # Metadata for the pods
+    metadata:
+      labels:
+        app: kubernetes-demo-api    # Label applied to each pod
+    
+    # Specification for the pod containers
+    spec:
+      containers:
+          # Container name
+          - name: kubernetes-demo-api
+            
+            # Docker image to use (built locally)
+            image: kubernetes-demo-api:latest
+            
+            # Never pull from registry, use local image only (for Minikube)
+            imagePullPolicy: Never
+            
+            # Container port that the application listens on
+            ports:
+              - containerPort: 3000
+            
+            # Environment variables passed to the container
+            env:
+              # Set Node.js environment to production
+              - name: NODE_ENV
+                value: production
+              
+              # Inject the pod's name as an environment variable
+              # This allows the app to know which pod it's running in
+              - name: POD_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.name  # Get the pod name from Kubernetes metadata

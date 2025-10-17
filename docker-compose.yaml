@@ -1,0 +1,29 @@
+# Docker Compose configuration for local development
+services:
+  # Define the 'api' service
+  api:
+    # Build configuration for the Docker image
+    build:
+      context: .              # Use the current directory as build context
+      dockerfile: Dockerfile  # Use the Dockerfile in the current directory
+    
+    # Set a custom name for the container (easier to identify in docker ps)
+    container_name: node-api
+    
+    # Port mapping: map host port 3000 to container port 3000
+    # Format: "host_port:container_port"
+    ports:
+      - "3000:3000"
+    
+    # Environment variables passed to the container
+    environment:
+      NODE_ENV: production  # Set Node environment to production
+    
+    # Volume mounts for live code reloading during development
+    volumes:
+      - .:/app               # Mount current directory to /app in container (sync code changes)
+      - /app/node_modules    # Prevent overwriting node_modules from the container
+    
+    # Override the default CMD from Dockerfile
+    # Run in development mode with auto-restart on file changes
+    command: npm run dev
